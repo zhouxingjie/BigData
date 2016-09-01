@@ -6,4 +6,6 @@ package com.youzan.settlement.api.account;
 public interface AccountService {
 
     int getByAcctNo(String acctNo);
+
+    String getAcctName(String acctNo);
 }
