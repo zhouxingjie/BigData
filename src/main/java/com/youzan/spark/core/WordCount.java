@@ -16,10 +16,9 @@ public class WordCount {
         SparkConf conf = new SparkConf().setAppName("demo").setMaster("local[*]");
         JavaSparkContext sc = new JavaSparkContext(conf);
         JavaRDD<String> lines = sc.textFile("hdfs://localhost:9000/tmp/temp.txt");
-        JavaRDD<String> words = lines.flatMap(s -> Arrays.asList(s.split(" ")).iterator());
-        JavaPairRDD<String, Integer> ones = words.mapToPair(s -> new Tuple2<String, Integer>(s, 1));
-        JavaPairRDD<String, Integer> counts = ones.reduceByKey((i1, i2) -> i1 + i2);
-        counts.collect().forEach(System.out::println);
+        JavaRDD<String> words = lines.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
+        JavaPairRDD<String, Integer> counts = words.mapToPair(word -> new Tuple2<>(word, 1))
+                .reduceByKey((i1, i2) -> i1 + i2);
         counts.collect().forEach((tuple) -> System.out.printf("%s:%d\n", tuple._1, tuple._2));
         sc.stop();
     }
