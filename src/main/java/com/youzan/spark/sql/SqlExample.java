@@ -1,13 +1,16 @@
 package com.youzan.spark.sql;
 
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.spark.sql.functions.col;
 
@@ -67,9 +70,35 @@ public class SqlExample {
         Dataset<Row> df1 = sparkSession.sql("select name from people where age = 19");
 
         df1.map(row -> {
-            return row.getString(0);
+            return row.getAs("name") + ":" + row.getString(0);
         }, Encoders.STRING()).show();
 
+    }
+
+    @Test
+    public void schema() {
+        JavaRDD<String> rdd = sparkSession.read().textFile("src/main/resources/people.txt").toJavaRDD();
+        String schemaString = "name age";
+
+        List<StructField> fields = new ArrayList<>();
+        for (String fieldName : schemaString.split(" ")) {
+            fields.add(DataTypes.createStructField(fieldName, DataTypes.StringType, true));
+        }
+        StructType schema = DataTypes.createStructType(fields);
+
+        JavaRDD<Row> rowRdd = rdd.map(row -> {
+            String[] arr = row.split(",");
+            return RowFactory.create(arr[0], arr[1]);
+        });
+        Dataset<Row> df = sparkSession.createDataFrame(rowRdd, schema);
+        df.createOrReplaceTempView("people");
+        Dataset<Row> df1 = sparkSession.sql("select name,age from people where age = 19");
+
+        JavaRDD<String> rdd1 = df1.map(row -> {
+            return row.getString(0) + "," + row.getString(1);
+        }, Encoders.STRING()).toJavaRDD();
+
+        rdd1.saveAsTextFile("result");
     }
 
     @AfterClass
