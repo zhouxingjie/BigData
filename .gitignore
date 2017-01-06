@@ -3,4 +3,6 @@ target
 BigData.iml
 .DS_Store
 result/*
-
+*.log
+metastore_db
+spark-warehouse

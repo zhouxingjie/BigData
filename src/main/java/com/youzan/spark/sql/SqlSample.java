@@ -17,7 +17,7 @@ import static org.apache.spark.sql.functions.col;
 /**
  * Created by xingjie.zhou on 2017/1/4.
  */
-public class SqlExample {
+public class SqlSample {
 
     private static SparkSession sparkSession;
 
