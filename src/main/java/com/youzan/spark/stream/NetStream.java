@@ -17,7 +17,7 @@ import java.util.Arrays;
 /**
  * Created by xingjie.zhou on 2017/1/7.
  */
-public class Stream {
+public class NetStream {
 
     private static JavaStreamingContext context;
 
