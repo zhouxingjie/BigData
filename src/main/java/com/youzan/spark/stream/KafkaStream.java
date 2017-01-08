@@ -40,10 +40,11 @@ public class KafkaStream {
 
         JavaDStream<String> lines = messages.map(t -> {
             System.out.println(t);
-            return t._2();});
+            return t._2();
+        });
         JavaDStream<String> words = lines.flatMap(line -> Arrays.asList(line.split(" ")).iterator());
         JavaPairDStream<String, Integer> wordCounts = words.mapToPair(word -> new Tuple2<String, Integer>(word, 1));
-        wordCounts.reduceByKey((x,y) -> x+y).print();
+        wordCounts.reduceByKey((x, y) -> x + y).print();
 
         context.start();
         try {
